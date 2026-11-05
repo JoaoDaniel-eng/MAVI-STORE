@@ -1,0 +1,121 @@
+# Blueprint do Render. Valores com sync:false são preenchidos no painel (nunca no repositório).
+services:
+  - type: web
+    name: mavi-api
+    runtime: node
+    rootDir: .
+    buildCommand: npm ci && npm run build -w apps/api
+    startCommand: npm run start:prod -w apps/api   # aplica migrations e sobe a API
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL        # string de conexão do Neon
+        sync: false
+      - key: CORS_ORIGIN         # URL(s) do front, separadas por vírgula
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: COOKIE_DOMAIN       # ex.: .seudominio.com.br (web e api no mesmo domínio raiz)
+        sync: false
+      # Integrações: deixe sem valor até haver credenciais (ficam "pendente").
+      - key: MERCADOPAGO_ACCESS_TOKEN
+        sync: false
+      - key: ASAAS_API_KEY
+        sync: false
+      - key: ASAAS_ENV
+        value: production
+      - key: ASAAS_WEBHOOK_TOKEN
+        sync: false
+      - key: MERCADOPAGO_WEBHOOK_SECRET
+        sync: false
+      - key: PAYMENT_GATEWAY     # mercadopago ou asaas; vazio = pagamentos online desligados
+        sync: false
+      - key: API_PUBLIC_URL      # URL pública da API
+        sync: false
+      - key: SITE_URL            # URL pública da loja
+        sync: false
+      - key: MELHOR_ENVIO_TOKEN
+        sync: false
+      - key: MELHOR_ENVIO_ENV
+        value: production
+      - key: MELHOR_ENVIO_CONTACT_EMAIL
+        sync: false
+      - key: EMAIL_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: STORAGE_BUCKET
+        sync: false
+      - key: STORAGE_ACCESS_KEY
+        sync: false
+      - key: STORAGE_SECRET_KEY
+        sync: false
+      - key: STORAGE_ENDPOINT
+        sync: false
+      - key: STORAGE_PUBLIC_URL
+        sync: false
+
+  - type: web
+    name: mavi-web
+    runtime: static
+    buildCommand: npm ci && npm run build -w apps/web
+    staticPublishPath: apps/web/dist
+    envVars:
+      - key: VITE_API_URL        # URL pública da API (ex.: https://api.seudominio.com.br)
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: Permissions-Policy
+        value: camera=(), microphone=(), geolocation=(), payment=()
+      - path: /*
+        name: Content-Security-Policy
+        # img-src e connect-src abertos a https: porque o domínio do storage e da API variam por implantação; restrinja quando os domínios forem definidos.
+        value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+
+  # Rede de segurança do estoque: libera reservas vencidas (a reserva também expira ao ser disputada).
+  - type: cron
+    name: mavi-expire-reservations
+    runtime: node
+    schedule: "* * * * *"
+    buildCommand: npm ci && npm run build -w apps/api
+    startCommand: node apps/api/dist/expire-reservations.js
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET   # exigido pela validação de ambiente; use o mesmo valor da API
+        sync: false
+      - key: EMAIL_API_KEY       # o cron também envia a fila de e-mails
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: SITE_URL
+        sync: false
+
+  # Manutenção diária: limpa tokens e e-mails antigos e anonimiza pedidos além do prazo de retenção.
+  - type: cron
+    name: mavi-maintenance
+    runtime: node
+    schedule: "0 6 * * *"
+    buildCommand: npm ci && npm run build -w apps/api
+    startCommand: node apps/api/dist/maintenance.js
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET   # exigido pela validação de ambiente; use o mesmo valor da API
+        sync: false
+      - key: ORDER_RETENTION_YEARS
+        value: "5"
