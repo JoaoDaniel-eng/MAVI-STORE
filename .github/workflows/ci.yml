@@ -1,0 +1,40 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mavi_ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/mavi_ci
+      JWT_ACCESS_SECRET: ci-only-secret-ci-only-secret-ci-only-secret
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Auditoria de dependências (não bloqueia; revise o resultado)
+        run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Migrations (up, down all, up)
+        run: |
+          npm run migrate -- up
+          npm run migrate -- down all
+          npm run migrate -- up

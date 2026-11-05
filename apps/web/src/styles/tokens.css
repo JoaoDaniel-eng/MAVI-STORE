@@ -1,0 +1,63 @@
+/* Design tokens MAVI. Nomes das cores em português; uso por token semântico. */
+:root {
+  /* Paleta base */
+  --mavi-perola: #F6F3F5;   /* fundo */
+  --mavi-nevoa: #E8E1E6;    /* superfícies e linhas */
+  --mavi-orquidea: #B98AAE; /* detalhe sobre fundo escuro */
+  --mavi-uva: #5A2D52;      /* cor da marca */
+  --mavi-ameixa: #2A1A2D;   /* texto */
+  --mavi-pedra: #625666;    /* texto secundário */
+  /* Estados */
+  --mavi-salvia: #4F6B5C;   /* sucesso */
+  --mavi-rubi: #A12F3F;     /* erro */
+  --mavi-ambar: #8A5A12;    /* aviso */
+
+  /* Semânticos */
+  --bg: var(--mavi-perola);
+  --surface: #FFFFFF;
+  --surface-muted: var(--mavi-nevoa);
+  --ink: var(--mavi-ameixa);
+  --ink-muted: var(--mavi-pedra);
+  --line: var(--mavi-nevoa);
+  --brand: var(--mavi-uva);
+  --on-brand: var(--mavi-perola);
+  --accent: var(--mavi-orquidea);
+  --success: var(--mavi-salvia);
+  --danger: var(--mavi-rubi);
+  --warning: var(--mavi-ambar);
+  --focus: var(--mavi-uva);
+
+  /* Tipografia */
+  --font-display: "Bodoni Moda Variable", "Bodoni 72", Didot, Georgia, serif;
+  --font-text: "Jost Variable", "Helvetica Neue", Arial, sans-serif;
+
+  --step--1: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  --step-1: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --step-2: clamp(1.625rem, 1.4rem + 1.1vw, 2.25rem);
+  --step-3: clamp(2.125rem, 1.7rem + 2.1vw, 3.5rem);
+  --step-4: clamp(2.75rem, 2rem + 3.8vw, 5.25rem);
+
+  --leading-text: 1.6;
+  --leading-display: 1.08;
+  --measure: 62ch;
+
+  /* Espaço (base 4px) e forma */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --radius-sm: 2px;  /* inputs, botões */
+  --radius-md: 6px;  /* painéis */
+  --container: 76rem;
+
+  /* Movimento */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 140ms;
+  --dur-base: 260ms;
+}

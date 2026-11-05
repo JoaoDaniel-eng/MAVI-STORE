@@ -1,0 +1,28 @@
+.logo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+.logo__word {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-optical-sizing: auto;
+  letter-spacing: 0.34em;
+  margin-right: -0.34em; /* compensa o espaço depois da última letra para centralizar */
+  font-size: var(--logo-size, 2rem);
+}
+.logo__tag {
+  margin-top: 0.7em;
+  font-family: var(--font-text);
+  font-weight: 400;
+  font-size: calc(var(--logo-size, 2rem) * 0.3);
+  letter-spacing: 0.22em;
+  margin-right: -0.22em;
+}
+.logo--sm { --logo-size: 1.25rem; }
+.logo--md { --logo-size: 2rem; }
+.logo--lg { --logo-size: clamp(3rem, 2rem + 5vw, 6rem); }
+.logo--ink { color: var(--ink); }
+.logo--brand { color: var(--brand); }
+.logo--light { color: var(--on-brand); }

@@ -1,0 +1,2 @@
+.soon { min-height: 60vh; display: grid; place-content: center; justify-items: center; gap: var(--space-8); padding: var(--space-12) var(--space-4); text-align: center; }
+.soon__note { font-family: var(--font-display); font-size: var(--step-1); }
