@@ -4,7 +4,7 @@ Monorepo: `apps/web` (React + TS + Vite), `apps/api` (Node + Express + TS), `pac
 
 ## Rodar localmente
 ```bash
-npm install                      # gera o package-lock.json (commite-o)
+npm install                      # instale as dependências; versione o package-lock.json gerado
 cp apps/api/.env.example apps/api/.env   # preencha DATABASE_URL (Neon)
 npm run migrate -- up
 npm run dev                      # web :5173, api :3001; /design mostra o design system
@@ -31,7 +31,12 @@ Toda escrita exige o cabeçalho `X-Requested-With: mavi` (proteção CSRF). Cook
 `npm run migrate -- up | down [n|all] | status` (SQL em `apps/api/migrations`, runner próprio em `src/db/migrate.ts`).
 
 ## Deploy (Render)
-`render.yaml` cria `mavi-api` (aplica migrations ao iniciar) e `mavi-web` (estático). Defina `DATABASE_URL` e `CORS_ORIGIN` no painel.
+`render.yaml` cria `mavi-api` (aplica migrations ao iniciar) e `mavi-web` (estático). Configure as variáveis nos dois serviços:
+- **mavi-api:** `DATABASE_URL` (Neon), `CORS_ORIGIN=https://mavi-store-1.onrender.com`, `API_PUBLIC_URL` com a URL pública real da API e `SITE_URL=https://mavi-store-1.onrender.com`.
+- **mavi-web:** `VITE_API_URL` com a URL pública real do serviço `mavi-api` (por exemplo, `https://mavi-api.onrender.com`, se esse for o endereço exibido no painel do Render). Essa variável é incorporada durante o build; salve e faça um novo deploy após alterá-la.
+- Não copie o exemplo sem conferir os endereços efetivos dos serviços no painel do Render. Em domínio personalizado, atualize `CORS_ORIGIN`, `SITE_URL` e `VITE_API_URL` para os domínios correspondentes.
+
+A página inicial mostra seções configuradas no painel; quando não há seções, apresenta os produtos ativos e, se o catálogo ainda estiver vazio, uma vitrine de boas-vindas sem inventar produtos ou preços.
 
 ## Painel (Fase 9A)
 Acesse `/admin` com uma conta da equipe (Proprietária, Gerente ou Funcionário). Telas: pedidos e retiradas, produtos (variações e imagens), categorias e atributos, estoque, cupons, página inicial e avaliações. O menu mostra só o que o perfil pode usar. Upload de imagens exige o storage configurado e CORS liberando PUT para o domínio do painel.

@@ -13,7 +13,7 @@ Use o mesmo domínio raiz para loja e API, por exemplo `www.sualoja.com.br` (loj
 `CORS_ORIGIN=https://www.sualoja.com.br`, `COOKIE_DOMAIN=.sualoja.com.br`, `SITE_URL=https://www.sualoja.com.br`, `API_PUBLIC_URL=https://api.sualoja.com.br`, `VITE_API_URL=https://api.sualoja.com.br` (esta no serviço da loja).
 
 ## 4. Render
-Suba o repositório no GitHub (com o `package-lock.json`: rode `npm install` uma vez e faça commit). No Render: New → Blueprint → aponte para o repositório. O `render.yaml` cria: API, loja (site estático), cron de reservas e e-mails (a cada minuto) e cron de manutenção (diário). Preencha as variáveis marcadas como "sync: false". A API aplica as migrations ao iniciar.
+Suba o repositório no GitHub (com os arquivos do projeto; após a primeira instalação, é recomendável gerar e versionar o `package-lock.json` para builds reproduzíveis). No Render: New → Blueprint → aponte para o repositório. O `render.yaml` instala dependências com `npm install` (o repositório ainda não inclui `package-lock.json`) e cria: API, loja (site estático), cron de reservas e e-mails (a cada minuto) e cron de manutenção (diário). Preencha as variáveis marcadas como "sync: false". A API aplica as migrations ao iniciar.
 
 | Variável | Onde | Observação |
 |---|---|---|

@@ -1,4 +1,4 @@
-import type { HomeSectionView, ProductListResponse } from "@mavi/shared";
+import type { HomeSectionView, ProductListResponse, StoreCategory } from "@mavi/shared";
 import { Link } from "react-router-dom";
 import { Logo } from "../components/Logo";
 import { ProductGrid } from "../components/ProductCard";
@@ -50,32 +50,88 @@ function Section({ s }: { s: HomeSectionView }) {
   );
 }
 
+function EmptyStorefront({ categories }: { categories: StoreCategory[] }) {
+  const topCategories = categories.filter((category) => !category.parentId);
+  return (
+    <>
+      <section className="home-intro">
+        <div className="container home-intro__content">
+          <p className="home-intro__eyebrow">MODA FEMININA · TERESÓPOLIS</p>
+          <Logo size="lg" tone="light" tagline />
+          <h1>Seu estilo, do seu jeito.</h1>
+          <p className="home-intro__text">
+            Uma nova experiência MAVI está chegando. Estamos preparando nosso catálogo online
+            para você conhecer as peças disponíveis em nossas lojas.
+          </p>
+          <Link to="/catalogo" className="btn btn--light">Explorar a loja</Link>
+        </div>
+      </section>
+      {topCategories.length > 0 && (
+        <section className="container block home-categories">
+          <h2 className="block__title">Explore por categoria</h2>
+          <div className="tiles">
+            {topCategories.map((category) => (
+              <Link key={category.id} to={`/categoria/${category.slug}`} className="tile home-category-tile">
+                <span>{category.name}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+      <section className="container home-note">
+        <p>Em breve, novidades da MAVI estarão disponíveis por aqui.</p>
+        <Link to="/catalogo" className="link-btn">Acessar catálogo</Link>
+      </section>
+    </>
+  );
+}
+
 export function Home() {
-  useSeo({ description: "MAVI, moda feminina em Teresópolis/RJ. Lojas no Shopping do Alto e no Shopping Comary." });
+  useSeo({ title: "MAVI | Moda feminina", description: "MAVI, moda feminina em Teresópolis/RJ. Conheça nossas lojas no Shopping do Alto e no Shopping Comary." });
   const home = useApi<HomeSectionView[]>("/api/store/home");
   const sections = home.data ?? [];
-  // Sem seções cadastradas, mostra as novidades reais do catálogo (se houver).
   const fallback = useApi<ProductListResponse>(home.data && sections.length === 0 ? "/api/store/products?pageSize=8" : null);
+  const categories = useApi<StoreCategory[]>(home.data && sections.length === 0 ? "/api/store/categories" : null);
 
-  if (home.loading && !home.data) return <p className="container state">Carregando…</p>;
-  if (home.error) return <p className="container state">{home.error}</p>;
-
-  if (sections.length) return <>{sections.map((s) => <Section key={s.id} s={s} />)}</>;
-
-  if (fallback.data?.items.length) {
+  if (home.loading && !home.data) return <p className="container state" role="status">Carregando a loja…</p>;
+  if (home.error) {
     return (
-      <section className="container block">
-        <h2 className="block__title">Novidades</h2>
-        <ProductGrid items={fallback.data.items} />
-        <p className="block__cta"><Link to="/catalogo" className="btn btn--ghost">Ver todos</Link></p>
+      <section className="container state home-error" role="alert">
+        <h1>Não foi possível carregar a loja agora.</h1>
+        <p>Verifique sua conexão e tente novamente em instantes.</p>
+        <button type="button" className="btn btn--ghost" onClick={() => window.location.reload()}>Tentar novamente</button>
       </section>
     );
   }
 
-  return (
-    <div className="soon">
-      <Logo size="lg" tone="brand" tagline />
-      <p className="soon__note">A loja online está em construção.</p>
-    </div>
-  );
+  if (sections.length) return <>{sections.map((s) => <Section key={s.id} s={s} />)}</>;
+  if (fallback.loading || categories.loading) return <p className="container state" role="status">Preparando a vitrine MAVI…</p>;
+  if (fallback.error) {
+    return (
+      <section className="container state home-error" role="alert">
+        <h1>A vitrine está temporariamente indisponível.</h1>
+        <p>Estamos com dificuldade para buscar o catálogo. Tente novamente em instantes.</p>
+        <button type="button" className="btn btn--ghost" onClick={() => window.location.reload()}>Tentar novamente</button>
+      </section>
+    );
+  }
+  if (fallback.data?.items.length) {
+    return (
+      <>
+        <section className="home-welcome">
+          <div className="container home-welcome__inner">
+            <p>MODA FEMININA · TERESÓPOLIS</p>
+            <h1>Descubra a MAVI.</h1>
+            <span>Peças para expressar quem você é.</span>
+          </div>
+        </section>
+        <section className="container block">
+          <h2 className="block__title">Novidades</h2>
+          <ProductGrid items={fallback.data.items} />
+          <p className="block__cta"><Link to="/catalogo" className="btn btn--ghost">Ver todos os produtos</Link></p>
+        </section>
+      </>
+    );
+  }
+  return <EmptyStorefront categories={categories.data ?? []} />;
 }

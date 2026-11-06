@@ -25,8 +25,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
+      - run: npm install --no-audit --no-fund
       - name: Auditoria de dependências (não bloqueia; revise o resultado)
         run: npm audit --omit=dev --audit-level=high
         continue-on-error: true

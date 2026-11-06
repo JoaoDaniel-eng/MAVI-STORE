@@ -4,7 +4,7 @@ services:
     name: mavi-api
     runtime: node
     rootDir: .
-    buildCommand: npm ci && npm run build -w apps/api
+    buildCommand: npm install --no-audit --no-fund && npm run build -w apps/api
     startCommand: npm run start:prod -w apps/api   # aplica migrations e sobe a API
     healthCheckPath: /api/health
     envVars:
@@ -59,7 +59,7 @@ services:
   - type: web
     name: mavi-web
     runtime: static
-    buildCommand: npm ci && npm run build -w apps/web
+    buildCommand: npm install --no-audit --no-fund && npm run build -w apps/web
     staticPublishPath: apps/web/dist
     envVars:
       - key: VITE_API_URL        # URL pública da API (ex.: https://api.seudominio.com.br)
@@ -91,7 +91,7 @@ services:
     name: mavi-expire-reservations
     runtime: node
     schedule: "* * * * *"
-    buildCommand: npm ci && npm run build -w apps/api
+    buildCommand: npm install --no-audit --no-fund && npm run build -w apps/api
     startCommand: node apps/api/dist/expire-reservations.js
     envVars:
       - key: DATABASE_URL
@@ -110,7 +110,7 @@ services:
     name: mavi-maintenance
     runtime: node
     schedule: "0 6 * * *"
-    buildCommand: npm ci && npm run build -w apps/api
+    buildCommand: npm install --no-audit --no-fund && npm run build -w apps/api
     startCommand: node apps/api/dist/maintenance.js
     envVars:
       - key: DATABASE_URL
